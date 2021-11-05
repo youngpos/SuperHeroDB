@@ -1,0 +1,83 @@
+﻿@page   "/superheroes"
+@inject ISuperHeroService superHeroService;
+@inject NavigationManager navigationManager
+@implements IDisposable
+
+<h3>Super Heroes</h3>
+
+@if (superHeroService.Heroes.Count == 0)
+{
+    <span>자료가 없습니다...</span>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Hero Name</th>
+                <th>Comic</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var hero in superHeroService.Heroes)
+            {
+            <tr>
+                <td>@hero.FirstName</td>
+                <td>@hero.LastName</td>
+                <td>@hero.HeroName</td>
+                <td>@hero.Comic.Name</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="() => ShowHero(hero.Id)">Show</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary" @onclick="() => EditHero(hero.Id)">Edit</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary" @onclick="() => DeleteHero(hero.Id)">Delete</button>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<EditSuperHero Hero="heroToEdit"></EditSuperHero>
+@code {
+
+    SuperHeroDB.Shared.SuperHero heroToEdit = new SuperHeroDB.Shared.SuperHero();
+
+    //List<SuperHeroDB.Shared.SuperHero> heroes = new List<SuperHeroDB.Shared.SuperHero>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await superHeroService.GetSuperHeroes();
+        superHeroService.OnChange += StateHasChanged;
+
+    }
+
+    void ShowHero(int id)
+    {
+        navigationManager.NavigateTo($"superhero/{id}");
+    }
+
+    void EditHero(int id)
+    {
+        heroToEdit = superHeroService.Heroes.Find(h => h.Id == id);
+    }
+
+    void DeleteHero(int id)
+    {
+        superHeroService.DeleteSuperHero(id);
+    }
+
+    public void Dispose()
+    {
+        superHeroService.OnChange -= StateHasChanged;
+    }
+
+}

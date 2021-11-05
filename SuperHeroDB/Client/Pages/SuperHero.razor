@@ -1,0 +1,28 @@
+﻿@page "/superhero/{id:int}"
+@inject ISuperHeroService superHeroService
+
+@if (hero == null)
+{
+    <span>자료가 없습니다...!</span>
+}
+else
+{
+<h3>이 자료의 영웅명은 [ @hero.HeroName] 입니다!</h3>
+}
+<h3>SuperHero</h3>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    SuperHeroDB.Shared.SuperHero hero = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine("This is the ID => " + Id);
+        //return base.OnInitializedAsync();
+        hero = await superHeroService.GetSuperHero(Id);
+    }
+
+}
